@@ -12,12 +12,12 @@ import { requireAuth } from './middleware/requireAuth';
 import './config/redis';
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 4005;
 
 // Middleware
 app.use(
 	cors({
-		origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+		origin: process.env.FRONTEND_URL || 'http://localhost:3005',
 		credentials: true
 	})
 );
