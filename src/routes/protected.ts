@@ -1,11 +1,10 @@
-import { Router, Request, Response } from 'express';
+import { Router } from 'express';
 
+import { createItemHandler } from './handlers/items/create-item';
+import { getItemHandler } from './handlers/items/get-item';
 const router = Router();
 
-router.get('/hello', async (req: Request, res: Response) => {
-  // Session is already validated by requireAuth middleware
-  // and attached to req.session
-  return res.status(200).json({ message: 'hello' });
-});
+router.post('/items/new', createItemHandler);
+router.get('/items/:id', getItemHandler);
 
 export default router;
