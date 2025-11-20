@@ -20,12 +20,14 @@ export const getItems = async (ids: string[]) => {
 		return client.hGetAll(itemsKey(id));
 	});
 	const results = await Promise.all(commands);
-	results.map((result, index) => {
-		if (Object.keys(result).length === 0) {
-			return null;
-		}
-		return deserialize(ids[index], result);
-	});
+	return results
+		.map((result, index) => {
+			if (Object.keys(result).length === 0) {
+				return null;
+			}
+			return deserialize(ids[index], result);
+		})
+		.filter(Boolean);
 };
 
 export const createItem = async (attrs: CreateItemAttrs) => {

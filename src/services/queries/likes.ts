@@ -1,18 +1,43 @@
 import { client } from '../../config/redis';
-import { userLikesKey } from '../../utils/keys';
+import { itemsKey, userLikesKey } from '../../utils/keys';
+import { getItems } from './items/items';
 
 export const userLikesItem = async (itemId: string, userId: string) => {
 	return client.sIsMember(userLikesKey(userId), itemId);
 };
 
-export const likedItems = async (userId: string) => {};
+export const likedItems = async (userId: string) => {
+	const ids = await client.sMembers(userLikesKey(userId));
+
+	if (!ids.length) {
+		return [];
+	}
+
+	return getItems(ids);
+};
 
 export const likeItem = async (itemId: string, userId: string) => {
 	const inserted = await client.sAdd(userLikesKey(userId), itemId);
+
+	if (inserted) {
+		await client.hIncrBy(itemsKey(itemId), 'likes', 1);
+	}
 };
 
 export const unlikeItem = async (itemId: string, userId: string) => {
 	const removed = await client.sRem(userLikesKey(userId), itemId);
+
+	if (removed) {
+		await client.hIncrBy(itemsKey(itemId), 'likes', -1);
+	}
 };
 
-export const commonLikedItems = async (userOneId: string, userTwoId: string) => {};
+export const commonLikedItems = async (userOneId: string, userTwoId: string) => {
+	const ids = await client.sInter([userLikesKey(userOneId), userLikesKey(userTwoId)]);
+
+	if (!ids.length) {
+		return [];
+	}
+
+	return getItems(ids);
+};
